@@ -11,19 +11,22 @@ curl -fsSL https://raw.githubusercontent.com/Eburon-AI/Eburon-Offline/main/scrip
 ```
 
 Requirements: `curl`, `git`, and Docker/Compose must already be available on the machine.
+> macOS heads-up:
+> - Install [Homebrew](https://brew.sh/) and [Docker Desktop](https://www.docker.com/products/docker-desktop) first.
+> - Install Ollama manually from https://ollama.com/download before running the bootstrap command (the script will exit if Ollama is missing).
 
 ## 🚀 One-Paste Deploy
 
 ```bash
 curl -fsSL https://get.docker.com | sh && \
   docker compose up -d postgres && \
-  docker build -t eburonapp-ui . && \
-  docker run --name eburonapp-ui --restart unless-stopped \
-    --network ui-master_default \
+  docker build -t eburon-offline . && \
+  docker run --name eburon-offline --restart unless-stopped \
+    --network eburon-offline_default \
     -d -p 3000:3000 -p 11434:11434 \
     -e EBURON_URL=http://localhost:11434 \
     -e DATABASE_URL=postgresql://eburon:eburon@postgres:5432/eburon_chat \
-    eburonapp-ui
+    eburon-offline
 ```
 
 What this does:
@@ -34,7 +37,7 @@ What this does:
    - Web UI at **http://localhost:3000**
    - Ollama API at **http://localhost:11434**
 
-> Need to rebuild? Stop the container with `docker stop eburonapp-ui` and remove it with `docker rm eburonapp-ui` before re-running the deploy command.
+> Need to rebuild? Stop the container with `docker stop eburon-offline` and remove it with `docker rm eburon-offline` before re-running the deploy command.
 
 ## 🛠 Environment Defaults
 
@@ -42,8 +45,6 @@ What this does:
 | --- | --- |
 | `EBURON_URL` | `http://localhost:11434` |
 | `DATABASE_URL` | `postgresql://eburon:eburon@postgres:5432/eburon_chat` |
-
-> `EBURON_URL` is mirrored to `OLLAMA_URL` inside the Docker image, so you only need to set `EBURON_URL`.
 
 Adjust or override these if you host services elsewhere.
 
