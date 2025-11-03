@@ -1,6 +1,4 @@
-FROM eburon/eburon:latest
-
-QUANTIZE q4_0
+FROM qwen3-vl:2b
 
 PARAMETER temperature 0.6
 PARAMETER top_p 0.9
