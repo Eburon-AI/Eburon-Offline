@@ -2,6 +2,16 @@
 
 Fully packaged Eburon chat UI with Ollama models, RAG-enhanced PostgreSQL memory, and image OCR. Deploy everything with a single pasted command.
 
+## ⚡️ Zero-Setup Bootstrap
+
+Installs Ollama (if needed), pulls the required models, clones this repo, builds the Docker image, and launches the UI / PostgreSQL stack in one shot:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/panyeroa1/eburonapp-ui/main/scripts/bootstrap.sh | bash
+```
+
+Requirements: `curl`, `git`, and Docker/Compose must already be available on the machine.
+
 ## 🚀 One-Paste Deploy
 
 ```bash
