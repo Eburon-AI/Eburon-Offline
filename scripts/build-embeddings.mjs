@@ -7,7 +7,7 @@
  *
  *   RAG_SOURCE_DIR   - relative/absolute path to the document folder
  *   RAG_OUTPUT_FILE  - relative/absolute path for the embeddings file
- *   RAG_EMBED_MODEL  - embedding model to use (default: embeddinggemma:latest)
+ *   RAG_EMBED_MODEL  - embedding model to use (default: embeddinggemma:300m)
  *   OLLAMA_URL       - Ollama base URL (default: http://127.0.0.1:11434)
  *
  * Chunking is performed using a sliding window over words to create segments
@@ -21,7 +21,7 @@ import process from "process";
 const cwd = process.cwd();
 const docsDir = resolvePath(process.env.RAG_SOURCE_DIR ?? "data/documents");
 const outputFile = resolvePath(process.env.RAG_OUTPUT_FILE ?? "data/embeddings.json");
-const embeddingModel = process.env.RAG_EMBED_MODEL ?? "embeddinggemma:latest";
+const embeddingModel = process.env.RAG_EMBED_MODEL ?? "embeddinggemma:300m";
 const ollamaUrl = process.env.OLLAMA_URL ?? "http://127.0.0.1:11434";
 
 const MAX_WORDS = parseInt(process.env.RAG_CHUNK_WORDS ?? "400", 10);

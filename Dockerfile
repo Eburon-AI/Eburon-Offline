@@ -34,8 +34,8 @@ ENV PORT=3000
 RUN /bin/sh -c "\
   ollama serve & \
   until curl -sf http://localhost:11434/api/version >/dev/null; do sleep 1; done && \
-  ollama pull gpt-oss && \
-  ollama pull gemma3:1b && \
+  ollama pull embeddinggemma:300m && \
+  ollama pull eburon/eburon-tiny:latest && \
   ollama pull eburon/eburon && \
   pkill ollama \
 "

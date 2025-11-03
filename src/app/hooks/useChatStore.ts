@@ -40,7 +40,7 @@ const useChatStore = create<State & Actions>()(
       base64Images: null,
       chats: {},
       currentChatId: null,
-      selectedModel: "eburon/eburon",
+      selectedModel: "eburon-tiny:latest",
       userName: "Eburon",
       isDownloading: false,
       downloadProgress: 0,

@@ -42,7 +42,7 @@ curl -fsSL https://get.docker.com | sh && \
 What this does:
 1. Installs Docker if it isn’t already present.
 2. Starts the bundled PostgreSQL service defined in `docker-compose.yml` (auto-seeded with the chat memory schema).
-3. Builds the Next.js + Ollama image (Gemma 3 1B, GPT-OSS, and Eburon models are pre-pulled).
+3. Builds the Next.js + Ollama image (Eburon Tiny, embeddinggemma 300M, and full Eburon models are pre-pulled).
 4. Runs the UI container, exposing:
    - Web UI at **http://localhost:3000**
    - Ollama API at **http://localhost:11434**

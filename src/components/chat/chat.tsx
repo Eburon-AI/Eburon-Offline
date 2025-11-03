@@ -41,12 +41,15 @@ export default function Chat({ initialMessages, id, isMobile }: ChatProps) {
     },
     onFinish: (message) => {
       const enhancedMessage = enhanceAssistantMessage(message);
-      if (messages.length > 0) {
-        const updatedMessagesForView = messages.map((entry) =>
-          entry.id === enhancedMessage.id ? enhancedMessage : entry
-        );
-        setMessages(updatedMessagesForView);
-      }
+      const hasExisting = messages.some(
+        (entry) => entry.id === enhancedMessage.id
+      );
+      const updatedMessagesForView = hasExisting
+        ? messages.map((entry) =>
+            entry.id === enhancedMessage.id ? enhancedMessage : entry
+          )
+        : [...messages, enhancedMessage];
+      setMessages(updatedMessagesForView);
       const savedMessages = getMessagesById(id);
       const updatedHistory = [...savedMessages, enhancedMessage];
       saveMessages(id, updatedHistory);
@@ -157,16 +160,18 @@ export default function Chat({ initialMessages, id, isMobile }: ChatProps) {
         wordCount > 0 ? wordCount / safeSeconds : 0;
       const energyKwh = tokenCount * 0.000022;
 
-      const statsLines = [
+      const statsLine = [
         `Tokens: ${tokenCount}`,
         `Characters/s: ${charactersPerSecond.toFixed(2)}`,
-        `WPS: ${wordsPerSecond.toFixed(2)}`,
         `Energy: ${energyKwh.toFixed(4)} kWh`,
-      ].join("\n");
+        `WPS: ${wordsPerSecond.toFixed(2)}`,
+      ].join(" | ");
+
+      const telemetryBlock = `<sub>${statsLine}</sub>`;
 
       const updatedBody = bodyText.length
-        ? `${bodyText}\n\n${statsLines}`
-        : statsLines;
+        ? `${bodyText}\n\n${telemetryBlock}`
+        : telemetryBlock;
 
       const newContent = noteSuffix
         ? `${updatedBody}\n\n${noteSuffix}`

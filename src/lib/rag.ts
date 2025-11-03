@@ -3,7 +3,7 @@ import path from "path";
 
 const DEFAULT_EMBED_FILE =
   process.env.RAG_EMBED_FILE ?? path.resolve(process.cwd(), "data/embeddings.json");
-const DEFAULT_EMBED_MODEL = process.env.RAG_EMBED_MODEL ?? "embeddinggemma:latest";
+const DEFAULT_EMBED_MODEL = process.env.RAG_EMBED_MODEL ?? "embeddinggemma:300m";
 const OLLAMA_URL = process.env.OLLAMA_URL ?? "http://127.0.0.1:11434";
 const CONTEXT_LIMIT = parseInt(process.env.RAG_CONTEXT_LIMIT ?? "3", 10);
 

@@ -1,10 +1,5 @@
 import { createOllama } from "ollama-ai-provider";
-import {
-  streamText,
-  convertToCoreMessages,
-  CoreMessage,
-  UserContent,
-} from "ai";
+import { streamText, convertToCoreMessages, UserContent } from "ai";
 import { buildContextFromEmbeddings } from "@/lib/rag";
 import {
   appendMessage,
@@ -50,22 +45,16 @@ export async function POST(req: Request) {
     messageContent.push({ type: "image", image });
   });
 
-  const contextMessages: CoreMessage[] = [];
+  const systemDirectives: string[] = [];
 
   if (data?.images?.length) {
-    contextMessages.push({
-      role: "system",
-      content: [
-        {
-          type: "text",
-          text: [
-            "One or more images were supplied.",
-            "Extract any visible text (OCR) and describe important visual details before answering.",
-            "If no text is detected, mention that explicitly.",
-          ].join(" "),
-        },
-      ],
-    });
+    systemDirectives.push(
+      [
+        "One or more images were supplied.",
+        "Extract any visible text (OCR) and describe important visual details before answering.",
+        "If no text is detected, mention that explicitly.",
+      ].join(" ")
+    );
   }
 
   try {
@@ -74,20 +63,14 @@ export async function POST(req: Request) {
     );
 
     if (contextText) {
-      contextMessages.push({
-        role: "system",
-        content: [
-          {
-            type: "text",
-            text: [
-              "Use the following context snippets when relevant. ",
-              "Cite references in brackets like [ref-1].",
-              "",
-              contextText,
-            ].join("\n"),
-          },
-        ],
-      });
+      systemDirectives.push(
+        [
+          "Use the following context snippets when relevant.",
+          "Cite references in brackets like [ref-1].",
+          "",
+          contextText,
+        ].join("\n")
+      );
     }
   } catch (error) {
     console.error("[rag] Failed to build retrieval context:", error);
@@ -114,18 +97,12 @@ export async function POST(req: Request) {
       }
 
       if (memoryLines.length > 0) {
-        contextMessages.push({
-          role: "system",
-          content: [
-            {
-              type: "text",
-              text: [
-                "Consider the stored conversation memory below when generating your response.",
-                ...memoryLines,
-              ].join("\n"),
-            },
-          ],
-        });
+        systemDirectives.push(
+          [
+            "Consider the stored conversation memory below when generating your response.",
+            ...memoryLines,
+          ].join("\n")
+        );
       }
     } catch (error) {
       console.error("[memory] Failed to build memory context:", error);
@@ -135,9 +112,9 @@ export async function POST(req: Request) {
   // Stream text using the ollama model
   const result = await streamText({
     model: ollama(selectedModel),
+    system: systemDirectives.length ? systemDirectives.join("\n\n") : undefined,
     messages: [
       ...convertToCoreMessages(initialMessages),
-      ...contextMessages,
       { role: "user", content: messageContent },
     ],
   });

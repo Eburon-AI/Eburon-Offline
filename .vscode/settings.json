@@ -2,10 +2,16 @@
     "cSpell.words": [
         "Eburon",
         "eburonapp",
+        "Bottombar",
+        "Topbar",
+        "bottombar",
         "embeddinggemma",
         "initdb",
+        "langchain",
         "OLLAMA",
         "procps",
-        "qwen"
+        "qwen",
+        "topbar",
+        "uuidv"
     ]
 }

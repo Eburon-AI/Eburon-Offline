@@ -69,9 +69,9 @@ if ! curl -fsS http://127.0.0.1:11434/api/version >/dev/null 2>&1; then
 fi
 
 MODELS=(
+  "embeddinggemma:300m"
+  "eburon/eburon-tiny:latest"
   "eburon/eburon"
-  "gemma3:1b"
-  "gpt-oss"
 )
 
 for model in "${MODELS[@]}"; do
@@ -127,7 +127,7 @@ cat <<EOF
 \033[1;32mAll set!\033[0m
 - Web UI:        http://localhost:3000
 - Ollama API:    http://localhost:11434
-- Ollama models: eburon/eburon, gemma3:1b, gpt-oss (pre-pulled locally and inside the container image)
+- Ollama models: embeddinggemma:300m, eburon/eburon-tiny:latest, eburon/eburon (pre-pulled locally and inside the container image)
 - PostgreSQL:    running via Docker Compose service 'postgres'
 
 Next steps:
