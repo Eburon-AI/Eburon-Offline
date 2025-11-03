@@ -5,6 +5,7 @@
         "embeddinggemma",
         "initdb",
         "OLLAMA",
-        "procps"
+        "procps",
+        "qwen"
     ]
 }

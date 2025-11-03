@@ -40,18 +40,27 @@ export default function Chat({ initialMessages, id, isMobile }: ChatProps) {
       }
     },
     onFinish: (message) => {
+      const enhancedMessage = enhanceAssistantMessage(message);
+      if (messages.length > 0) {
+        const updatedMessagesForView = messages.map((entry) =>
+          entry.id === enhancedMessage.id ? enhancedMessage : entry
+        );
+        setMessages(updatedMessagesForView);
+      }
       const savedMessages = getMessagesById(id);
-      const updatedHistory = [...savedMessages, message];
+      const updatedHistory = [...savedMessages, enhancedMessage];
       saveMessages(id, updatedHistory);
       setLoadingSubmit(false);
       router.replace(`/c/${id}`);
-      void persistAssistantMemory(message, updatedHistory);
+      void persistAssistantMemory(enhancedMessage, updatedHistory);
     },
     onError: (error) => {
       setLoadingSubmit(false);
       router.replace("/");
       console.error(error.message);
       console.error(error.cause);
+      requestStartTimeRef.current = null;
+      lastSubmittedModelRef.current = null;
     },
   });
   const [loadingSubmit, setLoadingSubmit] = React.useState(false);
@@ -63,6 +72,8 @@ export default function Chat({ initialMessages, id, isMobile }: ChatProps) {
   const getMessagesById = useChatStore((state) => state.getMessagesById);
   const userName = useChatStore((state) => state.userName);
   const router = useRouter();
+  const requestStartTimeRef = useRef<number | null>(null);
+  const lastSubmittedModelRef = useRef<string | null>(null);
   const persistAssistantMemory = React.useCallback(
     async (assistantMessage: Message, history: Message[]) => {
       if (!assistantMessage?.content) {
@@ -93,6 +104,84 @@ export default function Chat({ initialMessages, id, isMobile }: ChatProps) {
     },
     [id, userName]
   );
+  const enhanceAssistantMessage = React.useCallback(
+    (message: Message): Message => {
+      if (!message?.content) {
+        requestStartTimeRef.current = null;
+        lastSubmittedModelRef.current = null;
+        return message;
+      }
+
+      if (lastSubmittedModelRef.current !== "eburon-tiny") {
+        requestStartTimeRef.current = null;
+        lastSubmittedModelRef.current = null;
+        return message;
+      }
+
+      if (message.content.includes("Tokens:")) {
+        requestStartTimeRef.current = null;
+        lastSubmittedModelRef.current = null;
+        return message;
+      }
+
+      const capabilityNote =
+        "<sub>eburon-tiny • optimized for edge/mobile deployments</sub>";
+      const trimmedContent = message.content.trimEnd();
+      let bodyText = message.content;
+      let noteSuffix = "";
+
+      if (trimmedContent.endsWith(capabilityNote)) {
+        noteSuffix = capabilityNote;
+        bodyText = trimmedContent
+          .slice(0, trimmedContent.length - capabilityNote.length)
+          .trimEnd();
+      }
+
+      const statsSource = bodyText.trim();
+      const characterCount = statsSource.length;
+      const wordCount =
+        statsSource.length > 0
+          ? statsSource.split(/\s+/).filter(Boolean).length
+          : 0;
+      const tokenCount = Math.max(1, Math.ceil(characterCount / 4));
+
+      const startTime = requestStartTimeRef.current;
+      const elapsedSeconds = startTime
+        ? (performance.now() - startTime) / 1000
+        : 0;
+      const safeSeconds = elapsedSeconds > 0.05 ? elapsedSeconds : 1;
+
+      const charactersPerSecond =
+        characterCount > 0 ? characterCount / safeSeconds : 0;
+      const wordsPerSecond =
+        wordCount > 0 ? wordCount / safeSeconds : 0;
+      const energyKwh = tokenCount * 0.000022;
+
+      const statsLines = [
+        `Tokens: ${tokenCount}`,
+        `Characters/s: ${charactersPerSecond.toFixed(2)}`,
+        `WPS: ${wordsPerSecond.toFixed(2)}`,
+        `Energy: ${energyKwh.toFixed(4)} kWh`,
+      ].join("\n");
+
+      const updatedBody = bodyText.length
+        ? `${bodyText}\n\n${statsLines}`
+        : statsLines;
+
+      const newContent = noteSuffix
+        ? `${updatedBody}\n\n${noteSuffix}`
+        : updatedBody;
+
+      requestStartTimeRef.current = null;
+      lastSubmittedModelRef.current = null;
+
+      return {
+        ...message,
+        content: newContent,
+      };
+    },
+    []
+  );
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -102,6 +191,9 @@ export default function Chat({ initialMessages, id, isMobile }: ChatProps) {
       toast.error("Please select a model");
       return;
     }
+
+    requestStartTimeRef.current = performance.now();
+    lastSubmittedModelRef.current = selectedModel ?? null;
 
     const userMessage: Message = {
       id: generateId(),
@@ -148,6 +240,8 @@ export default function Chat({ initialMessages, id, isMobile }: ChatProps) {
     stop();
     saveMessages(id, [...messages]);
     setLoadingSubmit(false);
+    requestStartTimeRef.current = null;
+    lastSubmittedModelRef.current = null;
   };
 
   return (
@@ -188,6 +282,8 @@ export default function Chat({ initialMessages, id, isMobile }: ChatProps) {
             loadingSubmit={loadingSubmit}
             reload={async () => {
               removeLatestMessage();
+              requestStartTimeRef.current = performance.now();
+              lastSubmittedModelRef.current = selectedModel ?? null;
 
               const requestOptions: ChatRequestOptions = {
                 body: {
