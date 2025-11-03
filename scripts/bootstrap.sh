@@ -2,11 +2,11 @@
 
 set -euo pipefail
 
-REPO_URL="https://github.com/panyeroa1/eburonapp-ui.git"
-CHECKOUT_DIR="${HOME}/eburonapp-ui"
-IMAGE_NAME="eburonapp-ui"
-CONTAINER_NAME="eburonapp-ui"
-PROJECT_NAME="$(basename "${CHECKOUT_DIR}")"
+REPO_URL="https://github.com/Eburon-AI/Eburon-Offline.git"
+CHECKOUT_DIR="${HOME}/Eburon-Offline"
+IMAGE_NAME="eburon-offline"
+CONTAINER_NAME="eburon-offline"
+DEFAULT_PROJECT_NAME="eburon-offline"
 
 info() {
   printf '\033[1;34m[INFO]\033[0m %s\n' "$*"
@@ -86,11 +86,14 @@ fi
 
 cd "${CHECKOUT_DIR}"
 
+COMPOSE_PROJECT_NAME="${COMPOSE_PROJECT_NAME:-${DEFAULT_PROJECT_NAME}}"
+export COMPOSE_PROJECT_NAME
+
 # --- infrastructure: postgres ---------------------------------------------
 info "Starting PostgreSQL (Docker Compose)..."
 ${DOCKER_COMPOSE} up -d postgres
 
-NETWORK_NAME="${PROJECT_NAME}_default"
+NETWORK_NAME="${COMPOSE_PROJECT_NAME}_default"
 
 # --- build & run UI container ----------------------------------------------
 info "Building Docker image (${IMAGE_NAME})..."
@@ -102,7 +105,7 @@ docker rm -f "${CONTAINER_NAME}" >/dev/null 2>&1 || true
 info "Launching UI container..."
 docker run --name "${CONTAINER_NAME}" --restart unless-stopped \
   --network "${NETWORK_NAME}" \
-  -d -p 3000:3000 \
+  -d -p 3000:3000 -p 11434:11434 \
   -e EBURON_URL=http://localhost:11434 \
   -e DATABASE_URL=postgresql://eburon:eburon@postgres:5432/eburon_chat \
   "${IMAGE_NAME}"
@@ -112,6 +115,7 @@ cat <<EOF
 
 \033[1;32mAll set!\033[0m
 - Web UI:        http://localhost:3000
+- Ollama API:    http://localhost:11434
 - Ollama models: eburon/eburon, gemma3:1b, gpt-oss (pre-pulled locally and inside the container image)
 - PostgreSQL:    running via Docker Compose service 'postgres'
 
