@@ -12,7 +12,8 @@ curl -fsSL https://raw.githubusercontent.com/Eburon-AI/Eburon-Offline/main/scrip
 
 Requirements: `curl`, `git`, and Docker/Compose must already be available on the machine.
 > macOS heads-up:
-> - Install [Homebrew](https://brew.sh/) and [Docker Desktop](https://www.docker.com/products/docker-desktop) first.
+> - Install [Homebrew](https://brew.sh/) (run `/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"`) and [Docker Desktop](https://www.docker.com/products/docker-desktop) first.
+>   - If you prefer Homebrew, `brew install --cask docker` installs Docker Desktop.
 > - Install Ollama manually from https://ollama.com/download before running the bootstrap command (the script will exit if Ollama is missing).
 
 ## 🚀 One-Paste Deploy
