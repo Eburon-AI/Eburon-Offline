@@ -50,13 +50,7 @@ if ! command -v ollama >/dev/null 2>&1; then
       info "Ollama installed. You may need to log out and back in if PATH was modified."
       ;;
     Darwin)
-      if command -v brew >/dev/null 2>&1; then
-        info "Installing Ollama via Homebrew..."
-        brew install ollama
-        info "Ollama installed via Homebrew."
-      else
-        error "Ollama is required. Install it from https://ollama.com/download or install Homebrew and run 'brew install ollama'."
-      fi
+      error "Ollama is required. Install it from https://ollama.com/download before running this script."
       ;;
     *)
       error "Unsupported operating system (${OS}). Install Ollama manually before running this script."
