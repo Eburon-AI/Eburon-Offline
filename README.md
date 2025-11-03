@@ -12,9 +12,18 @@ curl -fsSL https://raw.githubusercontent.com/Eburon-AI/Eburon-Offline/main/scrip
 
 Requirements: `curl`, `git`, and Docker/Compose must already be available on the machine.
 > macOS heads-up:
-> - Install [Homebrew](https://brew.sh/) (run `/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"`) and [Docker Desktop](https://www.docker.com/products/docker-desktop) first.
->   - If you prefer Homebrew, `brew install --cask docker` installs Docker Desktop.
-> - Install Ollama manually from https://ollama.com/download before running the bootstrap command (the script will exit if Ollama is missing).
+> - Install [Homebrew](https://brew.sh/) first:
+>   ```bash
+>   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+>   ```
+> - Install Docker Desktop (GUI download or `brew install --cask docker`) and launch it once so the Docker daemon is running.
+> - Install Ollama from https://ollama.com/download (or `brew install ollama`) and start it once.
+> - With Docker and Ollama running, run the bootstrap script either through the one-liner above or from a local checkout:
+>   ```bash
+>   git clone https://github.com/Eburon-AI/Eburon-Offline.git
+>   cd Eburon-Offline
+>   ./scripts/bootstrap.sh
+>   ```
 
 ## 🚀 One-Paste Deploy
 
