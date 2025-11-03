@@ -1,4 +1,4 @@
-# eburonapp-ui
+# Eburon
 
 Fully packaged Eburon chat UI with Ollama models, RAG-enhanced PostgreSQL memory, and image OCR. Deploy everything with a single pasted command.
 
